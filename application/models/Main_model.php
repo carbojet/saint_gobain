@@ -5,6 +5,7 @@ class Main_model extends CI_Model {
 	public function __construct() {
 
         parent::__construct();
+		
 		//secondary data
 		$this->db1 = $this->load->database('plant_2001', TRUE);
 		$this->db2 = $this->load->database('plant_2002', TRUE);
@@ -136,5 +137,25 @@ class Main_model extends CI_Model {
 		$this->db->order_by('module', 'ASC');
 		$query = $this->db->get();
 		return $query->result();
+	}
+
+	function get_user_by_sgid($sgid){		
+		try{
+			$this->db->select('user_id,sgid,employee_name,plant_id,both_plant_access,role,landing_page,active');
+			$this->db->from('serp_user');
+			$query = $this->db->get();
+			$data = $query->result();
+			if(count($data) <= 0){
+				$result['message'] = 'no records found';
+				$result['data'] = '';
+			}
+			$result['data'] = $data[0];
+			$result['message'] = 'user found';
+			$result['status'] = true;
+		} catch (Exception $e) {
+			$result['status'] = false;
+			$result['error'] = $e->getMessage();
+		}
+		return $result;
 	}
 }

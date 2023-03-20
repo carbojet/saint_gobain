@@ -91,11 +91,15 @@ class Sentinal extends CC_Main {
 	function load_sentinal_data_page($shape){
 
 		//row_id change to line_no
-		if (isset($_GET['line_no']) && isset($_GET['plant_id'])){
+		if (isset($_GET['line_no']) && isset($_GET['plant_id']) && isset($_GET['sgid']) ){
+
 			$data['row_id'] = $_GET['line_no'];
 			$data['plant_id'] = $_GET['plant_id'];
+			$data['sgid'] = $_GET['sgid'];
 			$data['shape'] = $shape;
 
+			$userResult = $this->get_user_verification($data);
+			
 			$data['module_master'] = $this->main_model->get_all_from_table('Module_Master', "plant_id = '".$data['plant_id']."'");
 			$data['quality_master'] = $this->main_model->get_all_from_table('Quality_Master', "");
 			
@@ -775,5 +779,14 @@ class Sentinal extends CC_Main {
 		}
 
 		header("Location: ".base_url('sentinal/shape/step-four.html?row_id='.$row_id.'&plant_id=').$plant_id."");
+	}
+
+	function get_user_verification($data){
+		try{
+			$result = $this->main_model->get_user_by_sgid($data['sgid']);
+		} catch (Exception $e){
+			$result['error'] = $e->getMessage();
+		}
+		return $result;
 	}
 }
