@@ -11,6 +11,6 @@ class Home extends CC_Main {
     }
 
 	public function index(){
-		
+		$this->load->view('unautorize');
 	}
 }

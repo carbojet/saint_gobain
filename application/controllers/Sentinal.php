@@ -91,7 +91,7 @@ class Sentinal extends CC_Main {
 	function load_sentinal_data_page($shape){
 
 		//row_id change to line_no
-		if (isset($_GET['line_no']) && isset($_GET['plant_id']) && isset($_GET['sgid']) ){
+		if (isset($_GET['line_no']) && $_GET['line_no']!='' && isset($_GET['plant_id']) && $_GET['plant_id']!='' && isset($_GET['sgid']) && $_GET['sgid']!='' ){
 
 			$data['row_id'] = $_GET['line_no'];
 			$data['plant_id'] = $_GET['plant_id'];
@@ -168,7 +168,7 @@ class Sentinal extends CC_Main {
 			$this->load->view('step-one', $data);
 		}else{
 			//invalid access
-			
+			$this->load->view('unautorize');
 		}
 	}
 
