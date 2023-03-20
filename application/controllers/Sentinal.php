@@ -98,11 +98,33 @@ class Sentinal extends CC_Main {
 			$data['sgid'] = $_GET['sgid'];
 			$data['shape'] = $shape;
 
-			$userResult = $this->get_user_verification($data);
+			$userResult = $this->main_model->get_user_by_sgid($data['sgid']);
+			if($userResult['status']){
+				$user = $userResult['data'];
+				$sentinal_data = [];
+				if($user->plant_id == $data['plant_id'] || $user->both_plant_access=='Yes'){
+					$plantResult = $this->main_model->get_sentinal_order_detail($data['plant_id'],'sale_order_details', "row_id = '".$data['row_id']."'");
+					if($plantResult['status']){
+						$sentinal_data = $plantResult['data'];
+					}
+				}
+			}
 			
 			$data['module_master'] = $this->main_model->get_all_from_table('Module_Master', "plant_id = '".$data['plant_id']."'");
 			$data['quality_master'] = $this->main_model->get_all_from_table('Quality_Master', "");
-			
+			$data['sentinal_data'] = array('customer_name' => $sentinal_data[0]->customer_name,
+												'item_number' => $sentinal_data[0]->item_number,
+												'oa_num' => $sentinal_data[0]->oa_num,
+												'module' => $sentinal_data[0]->module,
+												'category' => $sentinal_data[0]->category,
+												'quality' => $sentinal_data[0]->quality,
+												'shape' => strtoupper($shape),
+												'size' => $sentinal_data[0]->size,
+												'matl_desc' => $sentinal_data[0]->matl_desc,
+												'order_qty' => $sentinal_data[0]->order_qty,
+												'castingtype' => $sentinal_data[0]->type,
+												'sale_line_no' => $sentinal_data[0]->sale_line_no);
+			/*
 			if(isset($_GET['is_edit'])){
 				$data['is_edit'] = $_GET['is_edit'];
 				$sentinal_data = $this->main_model->get_all_from_table('sentineldata',  "unique_id = '".$data['row_id']."'");
@@ -120,6 +142,7 @@ class Sentinal extends CC_Main {
 												'sale_line_no' => $sentinal_data[0]->sale_line_no);
 
 			}else{
+				
 				if (isset($_GET['plant_id'])){
 					$this->db = $this->load->database('plant_'.$_GET['plant_id'], TRUE);
 				}else if(isset($_POST['plant_id'])){
@@ -141,8 +164,11 @@ class Sentinal extends CC_Main {
 												'castingtype' => $sentinal_data[0]->type,
 												'sale_line_no' => $sentinal_data[0]->sale_line_no);
 			}
-
+			*/
 			$this->load->view('step-one', $data);
+		}else{
+			//invalid access
+			
 		}
 	}
 
@@ -781,12 +807,4 @@ class Sentinal extends CC_Main {
 		header("Location: ".base_url('sentinal/shape/step-four.html?row_id='.$row_id.'&plant_id=').$plant_id."");
 	}
 
-	function get_user_verification($data){
-		try{
-			$result = $this->main_model->get_user_by_sgid($data['sgid']);
-		} catch (Exception $e){
-			$result['error'] = $e->getMessage();
-		}
-		return $result;
-	}
 }

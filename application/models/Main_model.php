@@ -7,8 +7,8 @@ class Main_model extends CI_Model {
         parent::__construct();
 		
 		//secondary data
-		$this->db1 = $this->load->database('plant_2001', TRUE);
-		$this->db2 = $this->load->database('plant_2002', TRUE);
+		$this->plant_2001 = $this->load->database('plant_2001', TRUE);
+		$this->plant_2002 = $this->load->database('plant_2002', TRUE);
     }
 	
 	
@@ -146,13 +146,52 @@ class Main_model extends CI_Model {
 			$query = $this->db->get();
 			$data = $query->result();
 			if(count($data) <= 0){
-				$result['message'] = 'no records found';
+				$result['message'] = $sgid.' not a vaild ! No User Found';
 				$result['data'] = '';
 			}
 			$result['data'] = $data[0];
-			$result['message'] = 'user found';
+			$result['message'] = $sgid.' User Found !';
 			$result['status'] = true;
 		} catch (Exception $e) {
+			$result['status'] = false;
+			$result['error'] = $e->getMessage();
+		}
+		return $result;
+	}
+	//get data based on plant id 2001 or 2002
+	function get_sentinal_order_detail($plant,$table,$where){
+		try{
+			if($plant=='2001'){
+				$this->plant_2001->select(''.$table.'.*');
+				$this->plant_2001->from($table);
+				if($where != ''){
+					$this->plant_2001->where($where);
+				}
+				$query = $this->plant_2001->get();
+				
+			}else if($plant=='2002'){
+				$this->plant_2002->select(''.$table.'.*');
+				$this->plant_2002->from($table);
+				if($where != ''){
+					$this->plant_2002->where($where);
+				}
+				$query = $this->plant_2002->get();
+			}else{
+				$this->db->select(''.$table.'.*');
+				$this->db->from($table);
+				if($where != ''){
+					$this->db->where($where);
+				}
+				$query = $this->db->get();
+			}
+			$result['data']  = $query->result();
+			if(count($result['data']) <= 0){
+				$result['message'] = 'No Records Found !';
+				$result['data'] = '';
+			}
+			$result['message'] = 'Records Found !';
+			$result['status'] = true;
+		}catch (Exception $e){
 			$result['status'] = false;
 			$result['error'] = $e->getMessage();
 		}
